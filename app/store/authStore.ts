@@ -59,11 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await AsyncStorage.setItem(STORAGE_KEY, token);
       
       try {
-        const response = await apiClient.get<{ datas: User }>('/api/v1/user', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await apiClient.get<{ datas: User }>('/api/v1/user');
         
         set({ 
           user: response.data.datas,
@@ -102,11 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true });
       
-      const response = await apiClient.get<{ datas: User }>('/api/v1/user', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await apiClient.get<{ datas: User }>('/api/v1/user');
       
       set({ user: response.data.datas });
       
