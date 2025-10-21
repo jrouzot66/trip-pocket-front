@@ -1,15 +1,14 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-// Configuration directe de l'API
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://192.168.1.98:3000';
 const API_TIMEOUT = 10000;
+const STORAGE_KEY = '@trip-pocket:accessToken';
 
-// Debug
 if (__DEV__) {
   console.log('🔧 Creating API client with baseURL:', API_BASE_URL);
 }
 
-// Configuration de base d'axios
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
@@ -18,17 +17,23 @@ const apiClient = axios.create({
   },
 });
 
-// Debug: Vérifier la configuration
 if (__DEV__) {
   console.log('🔧 apiClient.defaults.baseURL:', apiClient.defaults.baseURL);
 }
 
-// Intercepteur pour les requêtes
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    const token = await AsyncStorage.getItem(STORAGE_KEY);
+    if (token && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     if (__DEV__) {
       console.log('🚀 API Request:', config.method?.toUpperCase(), config.url);
-      console.log('🚀 Full URL:', config.baseURL + config.url);
+      console.log('🚀 Full URL:', `${config.baseURL ?? ''}${config.url ?? ''}`);
+      if (token) {
+        console.log('🔑 Bearer token ajouté');
+      }
     }
     return config;
   },
@@ -40,7 +45,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Intercepteur pour les réponses
 apiClient.interceptors.response.use(
   (response) => {
     if (__DEV__) {
@@ -53,7 +57,6 @@ apiClient.interceptors.response.use(
       console.error('❌ API Response Error:', error.response?.status, error.config?.url);
     }
     
-    // Gestion des erreurs communes
     if (error.response?.status === 401) {
       if (__DEV__) {
         console.log('🔐 Token expiré, redirection vers la connexion');

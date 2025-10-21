@@ -1,4 +1,3 @@
-// Configuration de l'application
 export const CONFIG = {
   APP: {
     NAME: 'Trip Pocket',

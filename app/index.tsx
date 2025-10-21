@@ -2,7 +2,6 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,16 +12,29 @@ import {
   View
 } from 'react-native';
 import { useLogin } from './hooks/useLogin';
+import { useAuthStore } from './store/authStore';
+import alert from './utils/alert';
 
-export default function Index() {
+export default function LoginScreen() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   
-  const { login, isLoading, error, isSuccess, reset } = useLogin();
+  const { login, isLoading, error, reset } = useLogin();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const storeIsLoading = useAuthStore((state) => state.isLoading);
+
+  useEffect(() => {
+    if (isAuthenticated && !storeIsLoading) {
+      const timer = setTimeout(() => {
+        router.replace('/profile');
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, storeIsLoading]);
 
   const handleLogin = async () => {
     if (!identifier.trim() || !password.trim()) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
@@ -35,25 +47,6 @@ export default function Index() {
     setPassword('');
   };
 
-  // Afficher un message de succès
-  useEffect(() => {
-    if (isSuccess) {
-      Alert.alert(
-        'Connexion réussie !', 
-        'Bienvenue dans Trip Pocket',
-        [
-          {
-            text: 'Continuer',
-            onPress: () => {
-              // Ici vous pouvez naviguer vers l'écran principal
-              console.log('Navigation vers l\'écran principal');
-            }
-          }
-        ]
-      );
-    }
-  }, [isSuccess]);
-
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
@@ -64,13 +57,11 @@ export default function Index() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.content}>
-          {/* Logo/Titre */}
           <View style={styles.header}>
             <Text style={styles.title}>Trip Pocket</Text>
             <Text style={styles.subtitle}>Connectez-vous à votre compte</Text>
           </View>
 
-          {/* Formulaire */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Email</Text>
@@ -100,14 +91,12 @@ export default function Index() {
               />
             </View>
 
-            {/* Message d'erreur */}
             {error && (
               <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
 
-            {/* Bouton de connexion */}
             <TouchableOpacity
               style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
               onPress={handleLogin}
@@ -120,20 +109,8 @@ export default function Index() {
                 <Text style={styles.loginButtonText}>Se connecter</Text>
               )}
             </TouchableOpacity>
-
-            {/* Bouton de réinitialisation */}
-            {isSuccess && (
-              <TouchableOpacity
-                style={styles.resetButton}
-                onPress={handleReset}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.resetButtonText}>Nouvelle connexion</Text>
-              </TouchableOpacity>
-            )}
           </View>
 
-          {/* Informations supplémentaires */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
               Pas encore de compte ?{' '}

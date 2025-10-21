@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import apiClient from '../config/apiClient';
+import { useAuthStore } from '../store/authStore';
 
 interface RegisterCredentials {
   username: string;
@@ -36,6 +37,7 @@ export const useRegister = (): UseRegisterReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const setToken = useAuthStore((state) => state.setToken);
 
   const register = async (credentials: RegisterCredentials): Promise<void> => {
     setIsLoading(true);
@@ -45,14 +47,8 @@ export const useRegister = (): UseRegisterReturn => {
     try {
       const response = await apiClient.post<RegisterResponse>('/auth/register', credentials);
       
-      // Stockage du token d'accès (vous pouvez adapter selon vos besoins)
-      const { accessToken, email, username } = response.data;
-      
-      // Ici vous pouvez stocker le token dans AsyncStorage, SecureStore, ou un contexte global
-      // Exemple avec AsyncStorage (nécessite l'installation de @react-native-async-storage/async-storage)
-      // await AsyncStorage.setItem('accessToken', accessToken);
-      // await AsyncStorage.setItem('userEmail', email);
-      // await AsyncStorage.setItem('username', username);
+      const { accessToken } = response.data;
+      await setToken(accessToken);
       
       setIsSuccess(true);
     } catch (err) {

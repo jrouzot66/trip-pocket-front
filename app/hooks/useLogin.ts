@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import apiClient from '../config/apiClient';
+import { useAuthStore } from '../store/authStore';
 
 interface LoginCredentials {
   identifier: string;
@@ -8,7 +9,11 @@ interface LoginCredentials {
 }
 
 interface LoginResponse {
-  accessToken: string;
+  datas: {
+    accessToken: string;
+  };
+  statusCode: number;
+  message: string;
 }
 
 interface UseLoginReturn {
@@ -23,6 +28,7 @@ export const useLogin = (): UseLoginReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const setToken = useAuthStore((state) => state.setToken);
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     setIsLoading(true);
@@ -37,14 +43,13 @@ export const useLogin = (): UseLoginReturn => {
     try {
       const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
       
-      // Stockage du token d'accès (vous pouvez adapter selon vos besoins)
-      const { accessToken } = response.data;
-      
-      // Ici vous pouvez stocker le token dans AsyncStorage, SecureStore, ou un contexte global
-      // Exemple avec AsyncStorage (nécessite l'installation de @react-native-async-storage/async-storage)
-      // await AsyncStorage.setItem('accessToken', accessToken);
-      
-      setIsSuccess(true);
+      const { datas, statusCode, message } = response.data;
+      if (statusCode === 200) {
+        await setToken(datas.accessToken);
+        setIsSuccess(true);
+      } else {
+        setError(message);
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;

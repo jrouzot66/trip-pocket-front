@@ -2,7 +2,6 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,8 +13,10 @@ import {
   View
 } from 'react-native';
 import { useRegister } from './hooks/useRegister';
+import { useAuthStore } from './store/authStore';
+import alert from './utils/alert';
 
-export default function Register() {
+export default function RegisterScreen() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -32,7 +33,18 @@ export default function Register() {
     visibility: 'PUBLIC'
   });
 
-  const { register, isLoading, error, isSuccess, reset } = useRegister();
+  const { register, isLoading, error, reset } = useRegister();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const storeIsLoading = useAuthStore((state) => state.isLoading);
+
+  useEffect(() => {
+    if (isAuthenticated && !storeIsLoading) {
+      const timer = setTimeout(() => {
+        router.replace('/profile');
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, storeIsLoading]);
 
   const updateFormData = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -43,17 +55,17 @@ export default function Register() {
     const emptyFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (emptyFields.length > 0) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
+      alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
       return false;
     }
 
     if (!formData.rgpd) {
-      Alert.alert('Erreur', 'Vous devez accepter les conditions RGPD');
+      alert('Erreur', 'Vous devez accepter les conditions RGPD');
       return false;
     }
 
     if (formData.password.length < 6) {
-      Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
+      alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
       return false;
     }
 
@@ -85,24 +97,6 @@ export default function Register() {
     });
   };
 
-  // Afficher un message de succès
-  useEffect(() => {
-    if (isSuccess) {
-      Alert.alert(
-        'Inscription réussie !', 
-        'Votre compte a été créé avec succès',
-        [
-          {
-            text: 'Continuer',
-            onPress: () => {
-              // Navigation vers l'écran principal ou de connexion
-              router.push('/');
-            }
-          }
-        ]
-      );
-    }
-  }, [isSuccess]);
 
   return (
     <KeyboardAvoidingView 
@@ -115,15 +109,12 @@ export default function Register() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Créer un compte</Text>
             <Text style={styles.subtitle}>Rejoignez Trip Pocket</Text>
           </View>
 
-          {/* Formulaire */}
           <View style={styles.form}>
-            {/* Informations personnelles */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informations personnelles</Text>
               
@@ -299,16 +290,6 @@ export default function Register() {
                 <Text style={styles.registerButtonText}>Créer mon compte</Text>
               )}
             </TouchableOpacity>
-
-            {isSuccess && (
-              <TouchableOpacity
-                style={styles.resetButton}
-                onPress={handleReset}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.resetButtonText}>Nouvelle inscription</Text>
-              </TouchableOpacity>
-            )}
 
             {/* Lien vers connexion */}
             <TouchableOpacity
