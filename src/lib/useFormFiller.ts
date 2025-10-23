@@ -41,7 +41,7 @@ export const useFormFiller = (initialData: FormData = defaultFormData) => {
     const firstNames = ['Jean', 'Marie', 'Pierre', 'Sophie', 'Antoine', 'Camille', 'Lucas', 'Emma', 'Thomas', 'Léa'];
     const lastNames = ['Martin', 'Bernard', 'Thomas', 'Petit', 'Robert', 'Richard', 'Durand', 'Dubois', 'Moreau', 'Laurent'];
     const cities = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'];
-    const genders = ['MAN', 'WOMAN', 'OTHER'];
+    const genders = ['MAN', 'WOMAN', 'NON_BINARY'];
     
     const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
