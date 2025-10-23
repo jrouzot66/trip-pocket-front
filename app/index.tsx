@@ -19,7 +19,7 @@ export default function LoginScreen() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   
-  const { login, isLoading, error, reset } = useLogin();
+  const { login, isLoading, error, reset, needsVerification } = useLogin();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const storeIsLoading = useAuthStore((state) => state.isLoading);
 
@@ -31,6 +31,18 @@ export default function LoginScreen() {
       return () => clearTimeout(timer);
     }
   }, [isAuthenticated, storeIsLoading]);
+
+  useEffect(() => {
+    if (needsVerification) {
+      const timer = setTimeout(() => {
+        router.push({
+          pathname: '/verify-account',
+          params: { identifier, password }
+        });
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [needsVerification, identifier, password]);
 
   const handleLogin = async () => {
     if (!identifier.trim() || !password.trim()) {

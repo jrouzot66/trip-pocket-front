@@ -10,7 +10,8 @@ interface LoginCredentials {
 
 interface LoginResponse {
   datas: {
-    accessToken: string;
+    accessToken: string | null;
+    verifyAccount: boolean;
   };
   statusCode: number;
   message: string;
@@ -21,6 +22,7 @@ interface UseLoginReturn {
   isLoading: boolean;
   error: string | null;
   isSuccess: boolean;
+  needsVerification: boolean;
   reset: () => void;
 }
 
@@ -28,12 +30,14 @@ export const useLogin = (): UseLoginReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
   const setToken = useAuthStore((state) => state.setToken);
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     setIsLoading(true);
     setError(null);
     setIsSuccess(false);
+    setNeedsVerification(false);
 
     if (__DEV__) {
       console.log('🔧 Login attempt with credentials:', credentials);
@@ -45,8 +49,15 @@ export const useLogin = (): UseLoginReturn => {
       
       const { datas, statusCode, message } = response.data;
       if (statusCode === 200) {
-        await setToken(datas.accessToken);
-        setIsSuccess(true);
+        // Vérifier si le compte est vérifié
+        if (datas.verifyAccount && datas.accessToken) {
+          await setToken(datas.accessToken);
+          setIsSuccess(true);
+        } else {
+          // Compte non vérifié - signaler qu'une vérification est nécessaire
+          setNeedsVerification(true);
+          setError(message);
+        }
       } else {
         setError(message);
       }
@@ -74,6 +85,7 @@ export const useLogin = (): UseLoginReturn => {
     setIsLoading(false);
     setError(null);
     setIsSuccess(false);
+    setNeedsVerification(false);
   };
 
   return {
@@ -81,6 +93,7 @@ export const useLogin = (): UseLoginReturn => {
     isLoading,
     error,
     isSuccess,
+    needsVerification,
     reset,
   };
 };

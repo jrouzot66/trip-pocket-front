@@ -7,6 +7,7 @@ interface RegisterCredentials {
   username: string;
   email: string;
   password: string;
+  phone: string;
   firstname: string;
   lastname: string;
   birthday: string;

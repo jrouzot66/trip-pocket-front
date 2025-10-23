@@ -15,12 +15,14 @@ import {
 import { useRegister } from './hooks/useRegister';
 import { useAuthStore } from './store/authStore';
 import alert from './utils/alert';
+import { getPasswordRequirements, validatePassword } from './utils/passwordValidation';
 
 export default function RegisterScreen() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
+    phone: '',
     firstname: '',
     lastname: '',
     birthday: '',
@@ -51,7 +53,7 @@ export default function RegisterScreen() {
   };
 
   const validateForm = (): boolean => {
-    const requiredFields = ['username', 'email', 'password', 'firstname', 'lastname', 'birthday', 'city'];
+    const requiredFields = ['username', 'email', 'password', 'phone', 'firstname', 'lastname', 'birthday', 'city'];
     const emptyFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
     if (emptyFields.length > 0) {
@@ -64,8 +66,15 @@ export default function RegisterScreen() {
       return false;
     }
 
-    if (formData.password.length < 6) {
-      alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      alert('Erreur', passwordValidation.errors.join('\n'));
+      return false;
+    }
+
+    // Validation du numéro de téléphone
+    if (formData.phone.length < 10) {
+      alert('Erreur', 'Le numéro de téléphone doit contenir au moins 10 caractères');
       return false;
     }
 
@@ -84,6 +93,7 @@ export default function RegisterScreen() {
       username: '',
       email: '',
       password: '',
+      phone: '',
       firstname: '',
       lastname: '',
       birthday: '',
@@ -174,16 +184,37 @@ export default function RegisterScreen() {
               </View>
 
               <View style={styles.inputContainer}>
+                <Text style={styles.label}>Téléphone *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="0601010101 ou +33601010101"
+                  value={formData.phone}
+                  onChangeText={(value) => updateFormData('phone', value)}
+                  keyboardType="phone-pad"
+                  editable={!isLoading}
+                  placeholderTextColor="#999"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
                 <Text style={styles.label}>Mot de passe *</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Au moins 6 caractères"
+                  placeholder="Mot de passe sécurisé"
                   value={formData.password}
                   onChangeText={(value) => updateFormData('password', value)}
                   secureTextEntry
                   editable={!isLoading}
                   placeholderTextColor="#999"
                 />
+                <View style={styles.passwordRequirements}>
+                  <Text style={styles.requirementsTitle}>Le mot de passe doit contenir :</Text>
+                  {getPasswordRequirements().map((requirement, index) => (
+                    <Text key={index} style={styles.requirementText}>
+                      • {requirement}
+                    </Text>
+                  ))}
+                </View>
               </View>
             </View>
 
@@ -459,5 +490,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#3498db',
     fontWeight: '600',
+  },
+  passwordRequirements: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e1e8ed',
+  },
+  requirementsTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 4,
+  },
+  requirementText: {
+    fontSize: 11,
+    color: '#7f8c8d',
+    lineHeight: 16,
   },
 });
