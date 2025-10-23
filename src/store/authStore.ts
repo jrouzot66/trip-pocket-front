@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import apiClient from '../config/apiClient';
+import apiClient from '../../app/config/apiClient';
 
 interface User {
   _id?: number;
@@ -54,6 +54,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: false,
 
   setToken: async (token: string) => {
+    // Validation du token
+    if (!token || token === 'undefined' || token === 'null') {
+      if (__DEV__) {
+        console.error('❌ Token invalide reçu:', token);
+      }
+      throw new Error('Token invalide');
+    }
+
     try {
       set({ isLoading: true, accessToken: token, isAuthenticated: true });
       await AsyncStorage.setItem(STORAGE_KEY, token);

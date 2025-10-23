@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
-import apiClient from '../../config/apiClient';
-import { useAuthStore } from '../../store/authStore';
+import apiClient from '../../app/config/apiClient';
+import { useAuthStore } from '../store/authStore';
 
 interface LoginCredentials {
   identifier: string;
@@ -50,7 +50,7 @@ export const useLogin = (): UseLoginReturn => {
       const { datas, statusCode, message } = response.data;
       if (statusCode === 200) {
         // Vérifier si le compte est vérifié
-        if (datas.verifyAccount && datas.accessToken) {
+        if (datas.verifyAccount && datas.accessToken && typeof datas.accessToken === 'string') {
           await setToken(datas.accessToken);
           setIsSuccess(true);
         } else {

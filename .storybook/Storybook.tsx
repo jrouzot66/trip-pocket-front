@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Avatar, Badge, Button, Card, DesignSystemDemo, Input } from '../app/components';
+import { Avatar, Badge, Button, Card, DesignSystemDemo, Input } from '../src/components';
 
 // Import stories
-require('../app/stories');
+require('../src/components');
 
 // Storybook UI with interactive demo
 const StorybookUIRoot = () => {

@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -10,8 +10,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useAuthStore } from './store/authStore';
-import { useChatStore, User } from './store/chatStore';
+import { useAuthStore } from '../src/store/authStore';
+import { useChatStore, User } from '../src/store/chatStore';
 
 export default function ChatScreen() {
   const { chatId } = useLocalSearchParams<{ chatId: string }>();

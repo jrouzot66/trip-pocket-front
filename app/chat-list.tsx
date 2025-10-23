@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useAuthStore } from './store/authStore';
-import { getDemoUsers, useChatStore, User } from './store/chatStore';
+import { useAuthStore } from '../src/store/authStore';
+import { getDemoUsers, useChatStore, User } from '../src/store/chatStore';
 
 export default function ChatListScreen() {
   const { chats, createChat, createGroupChat, getUnreadCount } = useChatStore();

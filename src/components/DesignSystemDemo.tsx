@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Avatar, Badge, Button, Card, Input } from './index';
+import { Avatar } from './Avatar';
+import { Badge } from './Badge';
+import { Button } from './Button';
+import { Card } from './Card';
+import { Input } from './Input';
 
 export const DesignSystemDemo: React.FC = () => {
   const [email, setEmail] = useState('');

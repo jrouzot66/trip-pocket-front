@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,9 +11,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useAuthStore } from '../src/store/authStore';
+import alert from '../src/utils/alert';
 import apiClient from './config/apiClient';
-import { useAuthStore } from './store/authStore';
-import alert from './utils/alert';
 
 interface VerifyResponse {
   statusCode: number;
@@ -55,7 +55,7 @@ export default function VerifyAccountScreen() {
         console.log('🔧 Verify response:', { statusCode, message, datas });
       }
       
-      if (statusCode === 200 && datas?.accessToken && datas?.verifyAccount) {
+      if (statusCode === 200 && datas?.accessToken && datas?.verifyAccount && typeof datas.accessToken === 'string') {
         await setToken(datas.accessToken);
         alert('Succès', 'Votre compte a été vérifié avec succès !');
         router.replace('/profile');
@@ -223,13 +223,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
     textAlign: 'center',
     letterSpacing: 2,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     elevation: 5,
   },
   verifyButton: {
@@ -238,18 +232,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: '#27ae60',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(39,174,96,0.3)',
     elevation: 8,
   },
   verifyButtonDisabled: {
     backgroundColor: '#bdc3c7',
-    shadowOpacity: 0,
     elevation: 0,
   },
   verifyButtonText: {

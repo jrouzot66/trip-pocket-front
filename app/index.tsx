@@ -11,9 +11,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useLogin } from './lib/hooks/useLogin';
-import { useAuthStore } from './store/authStore';
-import alert from './utils/alert';
+import { useLogin } from '../src/lib/useLogin';
+import { useAuthStore } from '../src/store/authStore';
+import alert from '../src/utils/alert';
 
 export default function LoginScreen() {
   const [identifier, setIdentifier] = useState('');
@@ -192,13 +192,7 @@ const styles = StyleSheet.create({
     borderColor: '#e1e8ed',
     fontSize: 16,
     color: '#2c3e50',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     elevation: 5,
   },
   errorContainer: {
@@ -220,18 +214,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#3498db',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(52,152,219,0.3)',
     elevation: 8,
   },
   loginButtonDisabled: {
     backgroundColor: '#bdc3c7',
-    shadowOpacity: 0,
     elevation: 0,
   },
   loginButtonText: {
@@ -245,13 +232,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 16,
-    shadowColor: '#27ae60',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(39,174,96,0.3)',
     elevation: 8,
   },
   resetButtonText: {

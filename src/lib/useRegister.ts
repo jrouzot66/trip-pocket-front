@@ -1,7 +1,9 @@
 import axios from 'axios';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import apiClient from '../../config/apiClient';
-import { useAuthStore } from '../../store/authStore';
+import apiClient from '../../app/config/apiClient';
+import { useAuthStore } from '../store/authStore';
+import alert from '../utils/alert';
 
 interface RegisterCredentials {
   username: string;
@@ -21,9 +23,12 @@ interface RegisterCredentials {
 }
 
 interface RegisterResponse {
-  email: string;
-  username: string;
-  accessToken: string;
+  datas: {
+    email: string;
+    username: string;
+  };
+  statusCode: number;
+  message: string;
 }
 
 interface UseRegisterReturn {
@@ -47,11 +52,14 @@ export const useRegister = (): UseRegisterReturn => {
 
     try {
       const response = await apiClient.post<RegisterResponse>('/auth/register', credentials);
-      
-      const { accessToken } = response.data;
-      await setToken(accessToken);
-      
-      setIsSuccess(true);
+      const { statusCode, message } = response.data;
+      if (statusCode === 201) {
+        alert('Succès', message);
+        setIsSuccess(true);
+        router.replace('/');
+      } else {
+        setError(message);
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;

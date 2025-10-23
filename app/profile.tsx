@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useAuthStore } from './store/authStore';
-import alert from './utils/alert';
+import { useAuthStore } from '../src/store/authStore';
+import alert from '../src/utils/alert';
 
 export default function ProfileScreen() {
   const user = useAuthStore((state) => state.user);
@@ -202,14 +202,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    elevation: 5,
   },
   avatarText: {
     fontSize: 40,
@@ -226,13 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     elevation: 5,
   },
   sectionTitle: {
@@ -276,13 +264,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#3498db',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(52,152,219,0.3)',
     elevation: 8,
   },
   chatButtonText: {
@@ -295,13 +277,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#e74c3c',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(231,76,60,0.3)',
     elevation: 8,
   },
   logoutButtonText: {

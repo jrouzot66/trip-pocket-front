@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useAuthStore } from './store/authStore';
-import { getDemoUsers, useChatStore, User } from './store/chatStore';
-import alert from './utils/alert';
+import { useAuthStore } from '../src/store/authStore';
+import { getDemoUsers, useChatStore, User } from '../src/store/chatStore';
+import alert from '../src/utils/alert';
 
 export default function CreateGroupScreen() {
   const { createGroupChat } = useChatStore();
@@ -272,18 +272,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#3498db',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(52,152,219,0.3)',
     elevation: 8,
   },
   createButtonDisabled: {
     backgroundColor: '#bdc3c7',
-    shadowOpacity: 0,
     elevation: 0,
   },
   createButtonText: {

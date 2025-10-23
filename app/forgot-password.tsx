@@ -11,9 +11,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { usePasswordReset } from './lib/hooks/usePasswordReset';
-import alert from './utils/alert';
-import { getPasswordRequirements, validatePassword } from './utils/passwordValidation';
+import { usePasswordReset } from '../src/lib/usePasswordReset';
+import alert from '../src/utils/alert';
+import { getPasswordRequirements, validatePassword } from '../src/utils/passwordValidation';
 
 type Step = 'email' | 'code' | 'password';
 
@@ -317,13 +317,7 @@ const styles = StyleSheet.create({
     borderColor: '#e1e8ed',
     fontSize: 16,
     color: '#2c3e50',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     elevation: 5,
   },
   errorContainer: {
@@ -345,18 +339,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#3498db',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    boxShadow: '0 4px 8px rgba(52,152,219,0.3)',
     elevation: 8,
   },
   buttonDisabled: {
     backgroundColor: '#bdc3c7',
-    shadowOpacity: 0,
     elevation: 0,
   },
   buttonText: {

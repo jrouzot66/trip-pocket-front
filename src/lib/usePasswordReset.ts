@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import apiClient from '../../config/apiClient';
+import apiClient from '../../app/config/apiClient';
 
 interface PasswordResetRequest {
   email: string;

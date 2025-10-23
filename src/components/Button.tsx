@@ -66,18 +66,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
     elevation: 5,
   },
   // Variants
   primary: {
     backgroundColor: '#3498db',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
   secondary: {
     backgroundColor: '#95a5a6',
@@ -104,7 +98,6 @@ const styles = StyleSheet.create({
   // States
   disabled: {
     backgroundColor: '#bdc3c7',
-    shadowOpacity: 0,
     elevation: 0,
   },
   // Text styles
