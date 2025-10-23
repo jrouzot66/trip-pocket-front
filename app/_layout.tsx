@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { useAuthInit } from "../src/lib/useAuthInit";
+import "../src/utils/suppressWarnings";
 
 // Import Storybook conditionally
 let StorybookUIRoot;
