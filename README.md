@@ -9,6 +9,8 @@ La documentation complète du projet est disponible dans le dossier [`docs/`](./
 - **[Guide d'authentification](./docs/AUTHENTICATION_SETUP.md)** - Configuration et utilisation du système d'authentification
 - **[Navigation](./docs/NAVIGATION_UPDATE.md)** - Système de navigation et routes protégées
 - **[Store](./docs/STORE.md)** - Documentation du store Zustand
+- **[Système de Design](./docs/DESIGN_SYSTEM_GUIDE.md)** - Guide complet du système de design et des composants
+- **[Storybook](./docs/STORYBOOK.md)** - Documentation de Storybook pour les composants
 
 👉 **[Lire la documentation complète](./docs/README.md)**
 

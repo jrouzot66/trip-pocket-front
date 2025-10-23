@@ -32,6 +32,25 @@ Documentation technique du store Zustand :
 
 **Référence technique** pour utiliser le store dans vos composants.
 
+### 🎨 [Système de Design](./DESIGN_SYSTEM_GUIDE.md)
+Guide complet du système de design et des composants :
+- Composants réutilisables (Button, Input, Card, Avatar, Badge)
+- Système de couleurs harmonisé
+- Typographie et espacement cohérents
+- Bonnes pratiques d'utilisation
+- Exemples d'intégration
+
+**À lire** pour utiliser les composants du système de design dans vos écrans.
+
+### 📚 [Storybook](./STORYBOOK.md)
+Documentation de Storybook pour les composants :
+- Configuration et lancement de Storybook
+- Navigation dans les stories
+- Test des composants isolément
+- Développement de nouveaux composants
+
+**À lire** pour développer et tester les composants du système de design.
+
 ## 🚀 Démarrage rapide
 
 ### 1. Premier lancement
@@ -109,6 +128,8 @@ app/
 - **Axios** - Client HTTP avec intercepteurs
 - **Expo Router** - Navigation
 - **React Native** - Framework mobile
+- **Storybook** - Documentation et test des composants
+- **Système de Design** - Composants harmonisés et réutilisables
 
 ## 📞 Endpoints API
 
