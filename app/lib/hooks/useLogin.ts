@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
-import apiClient from '../config/apiClient';
-import { useAuthStore } from '../store/authStore';
+import apiClient from '../../config/apiClient';
+import { useAuthStore } from '../../store/authStore';
 
 interface LoginCredentials {
   identifier: string;

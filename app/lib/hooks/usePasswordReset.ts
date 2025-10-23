@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import apiClient from '../config/apiClient';
+import apiClient from '../../config/apiClient';
 
 interface PasswordResetRequest {
   email: string;
@@ -50,7 +50,7 @@ export const usePasswordReset = (): UsePasswordResetReturn => {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
         if (status === 400) {
-          setError('Email invalide');
+          setError(err.response?.data?.message || 'Email invalide');
         } else if (status === 404) {
           setError('Aucun compte trouvé avec cet email');
         } else if (status && status >= 500) {

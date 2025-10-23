@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.1.98:3000';
-const API_TIMEOUT = 10000;
-const STORAGE_KEY = '@trip-pocket:accessToken';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.98:3000';
+const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT || '10000');
+const STORAGE_KEY = process.env.EXPO_PUBLIC_STORAGE_KEY || '@trip-pocket:accessToken';
 
 if (__DEV__) {
   console.log('🔧 Creating API client with baseURL:', API_BASE_URL);

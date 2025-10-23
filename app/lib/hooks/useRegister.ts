@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
-import apiClient from '../config/apiClient';
-import { useAuthStore } from '../store/authStore';
+import apiClient from '../../config/apiClient';
+import { useAuthStore } from '../../store/authStore';
 
 interface RegisterCredentials {
   username: string;
@@ -56,7 +56,7 @@ export const useRegister = (): UseRegisterReturn => {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
         if (status === 400) {
-          setError('Données d\'inscription invalides');
+          setError(err.response?.data?.message || 'Données d\'inscription invalides');
         } else if (status === 409) {
           setError('Un compte avec cet email ou nom d\'utilisateur existe déjà');
         } else if (status && status >= 500) {

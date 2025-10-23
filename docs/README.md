@@ -51,6 +51,15 @@ Documentation de Storybook pour les composants :
 
 **À lire** pour développer et tester les composants du système de design.
 
+### 🔧 [Variables d'environnement](./ENVIRONMENT_VARIABLES.md)
+Configuration des variables d'environnement :
+- Variables API (URL, timeout, clés de stockage)
+- Configuration Storybook
+- Exemples pour développement et production
+- Migration depuis la configuration hardcodée
+
+**À lire** pour configurer l'application selon l'environnement.
+
 ## 🚀 Démarrage rapide
 
 ### 1. Premier lancement

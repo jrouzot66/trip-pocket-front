@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useLogin } from './hooks/useLogin';
+import { useLogin } from './lib/hooks/useLogin';
 import { useAuthStore } from './store/authStore';
 import alert from './utils/alert';
 

@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { usePasswordReset } from './hooks/usePasswordReset';
+import { usePasswordReset } from './lib/hooks/usePasswordReset';
 import alert from './utils/alert';
 import { getPasswordRequirements, validatePassword } from './utils/passwordValidation';
 
