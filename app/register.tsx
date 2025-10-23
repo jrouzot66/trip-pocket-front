@@ -1,17 +1,16 @@
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
+import { Button, Input } from '../src/components';
 import { useFormFiller } from '../src/lib/useFormFiller';
 import { useRegister } from '../src/lib/useRegister';
 import { useAuthStore } from '../src/store/authStore';
@@ -109,91 +108,67 @@ export default function RegisterScreen() {
               
               <View style={styles.row}>
                 <View style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Prénom *</Text>
-                  <TextInput
-                    style={styles.input}
+                  <Input
+                    label="Prénom *"
                     placeholder="Votre prénom"
                     value={formData.firstname}
-                    onChangeText={(value) => updateFormData('firstname', value)}
+                    onChangeText={(value: string) => updateFormData('firstname', value)}
                     editable={!isLoading}
-                    placeholderTextColor="#999"
                   />
                 </View>
                 
                 <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={styles.label}>Nom *</Text>
-                  <TextInput
-                    style={styles.input}
+                  <Input
+                    label="Nom *"
                     placeholder="Votre nom"
                     value={formData.lastname}
-                    onChangeText={(value) => updateFormData('lastname', value)}
+                    onChangeText={(value: string) => updateFormData('lastname', value)}
                     editable={!isLoading}
-                    placeholderTextColor="#999"
                   />
                 </View>
               </View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Nom d'utilisateur *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Choisissez un nom d'utilisateur"
-                  value={formData.username}
-                  onChangeText={(value) => updateFormData('username', value)}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-              </View>
+              <Input
+                label="Nom d'utilisateur *"
+                placeholder="Choisissez un nom d'utilisateur"
+                value={formData.username}
+                onChangeText={(value: string) => updateFormData('username', value)}
+                editable={!isLoading}
+              />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Email *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="votre@email.com"
-                  value={formData.email}
-                  onChangeText={(value) => updateFormData('email', value)}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-              </View>
+              <Input
+                label="Email *"
+                placeholder="votre@email.com"
+                value={formData.email}
+                onChangeText={(value: string) => updateFormData('email', value)}
+                keyboardType="email-address"
+                editable={!isLoading}
+              />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Téléphone *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="0601010101 ou +33601010101"
-                  value={formData.phone}
-                  onChangeText={(value) => updateFormData('phone', value)}
-                  keyboardType="phone-pad"
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-              </View>
+              <Input
+                label="Téléphone *"
+                placeholder="0601010101 ou +33601010101"
+                value={formData.phone}
+                onChangeText={(value: string) => updateFormData('phone', value)}
+                keyboardType="phone-pad"
+                editable={!isLoading}
+              />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Mot de passe *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Mot de passe sécurisé"
-                  value={formData.password}
-                  onChangeText={(value) => updateFormData('password', value)}
-                  secureTextEntry
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-                <View style={styles.passwordRequirements}>
-                  <Text style={styles.requirementsTitle}>Le mot de passe doit contenir :</Text>
-                  {getPasswordRequirements().map((requirement, index) => (
-                    <Text key={index} style={styles.requirementText}>
-                      • {requirement}
-                    </Text>
-                  ))}
-                </View>
+              <Input
+                label="Mot de passe *"
+                placeholder="Mot de passe sécurisé"
+                value={formData.password}
+                onChangeText={(value: string) => updateFormData('password', value)}
+                secureTextEntry
+                editable={!isLoading}
+              />
+              <View style={styles.passwordRequirements}>
+                <Text style={styles.requirementsTitle}>Le mot de passe doit contenir :</Text>
+                {getPasswordRequirements().map((requirement, index) => (
+                  <Text key={index} style={styles.requirementText}>
+                    • {requirement}
+                  </Text>
+                ))}
               </View>
             </View>
 
@@ -201,67 +176,51 @@ export default function RegisterScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informations supplémentaires</Text>
               
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Date de naissance *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="YYYY-MM-DD"
-                  value={formData.birthday}
-                  onChangeText={(value) => updateFormData('birthday', value)}
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-              </View>
+              <Input
+                label="Date de naissance *"
+                placeholder="YYYY-MM-DD"
+                value={formData.birthday}
+                onChangeText={(value: string) => updateFormData('birthday', value)}
+                editable={!isLoading}
+              />
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Ville *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Votre ville"
-                  value={formData.city}
-                  onChangeText={(value) => updateFormData('city', value)}
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-              </View>
+              <Input
+                label="Ville *"
+                placeholder="Votre ville"
+                value={formData.city}
+                onChangeText={(value: string) => updateFormData('city', value)}
+                editable={!isLoading}
+              />
 
               <View style={styles.row}>
                 <View style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Pays</Text>
-                  <TextInput
-                    style={styles.input}
+                  <Input
+                    label="Pays"
                     placeholder="FR"
                     value={formData.countryCode}
-                    onChangeText={(value) => updateFormData('countryCode', value)}
+                    onChangeText={(value: string) => updateFormData('countryCode', value)}
                     editable={!isLoading}
-                    placeholderTextColor="#999"
                   />
                 </View>
                 
                 <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
-                  <Text style={styles.label}>Langue</Text>
-                  <TextInput
-                    style={styles.input}
+                  <Input
+                    label="Langue"
                     placeholder="fr"
                     value={formData.language}
-                    onChangeText={(value) => updateFormData('language', value)}
+                    onChangeText={(value: string) => updateFormData('language', value)}
                     editable={!isLoading}
-                    placeholderTextColor="#999"
                   />
                 </View>
               </View>
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Genre</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="MAN"
-                  value={formData.genderCode}
-                  onChangeText={(value) => updateFormData('genderCode', value)}
-                  editable={!isLoading}
-                  placeholderTextColor="#999"
-                />
-              </View>
+              <Input
+                label="Genre"
+                placeholder="MAN"
+                value={formData.genderCode}
+                onChangeText={(value: string) => updateFormData('genderCode', value)}
+                editable={!isLoading}
+              />
             </View>
 
             {/* Conditions */}
@@ -288,29 +247,24 @@ export default function RegisterScreen() {
             )}
 
             {/* Boutons */}
-            <TouchableOpacity
-              style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
+            <Button
+              title={isLoading ? "Création du compte..." : "Créer mon compte"}
               onPress={handleRegister}
               disabled={isLoading}
-              activeOpacity={0.8}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <Text style={styles.registerButtonText}>Créer mon compte</Text>
-              )}
-            </TouchableOpacity>
+              variant="primary"
+              size="large"
+              style={styles.registerButton}
+            />
 
             {/* Lien vers connexion */}
-            <TouchableOpacity
-              style={styles.loginLink}
+            <Button
+              title="Déjà un compte ? Se connecter"
               onPress={() => router.push('/')}
               disabled={isLoading}
-            >
-              <Text style={styles.loginLinkText}>
-                Déjà un compte ? Se connecter
-              </Text>
-            </TouchableOpacity>
+              variant="secondary"
+              size="small"
+              style={styles.loginLink}
+            />
           </View>
         </View>
       </ScrollView>

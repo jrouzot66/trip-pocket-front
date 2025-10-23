@@ -5,9 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
+import { Button } from '../src/components';
 import { useAuthStore } from '../src/store/authStore';
 import alert from '../src/utils/alert';
 
@@ -149,21 +149,21 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.actionsSection}>
-          <TouchableOpacity
-            style={styles.chatButton}
+          <Button
+            title="💬 Messages"
             onPress={() => router.push('/chat-list' as any)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.chatButtonText}>💬 Messages</Text>
-          </TouchableOpacity>
+            variant="primary"
+            size="medium"
+            style={styles.chatButton}
+          />
 
-          <TouchableOpacity
-            style={styles.logoutButton}
+          <Button
+            title="Se déconnecter"
             onPress={handleLogout}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.logoutButtonText}>Se déconnecter</Text>
-          </TouchableOpacity>
+            variant="danger"
+            size="medium"
+            style={styles.logoutButton}
+          />
         </View>
       </View>
     </ScrollView>

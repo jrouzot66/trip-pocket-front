@@ -1,16 +1,14 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  TouchableOpacity,
   View
 } from 'react-native';
+import { Button, Input } from '../src/components';
 import { useLogin } from '../src/lib/useLogin';
 import { useAuthStore } from '../src/store/authStore';
 import alert from '../src/utils/alert';
@@ -75,69 +73,57 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Entrez votre email"
-                value={identifier}
-                onChangeText={setIdentifier}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-                placeholderTextColor="#999"
-              />
-            </View>
+            <Input
+              label="Email"
+              placeholder="Entrez votre email"
+              value={identifier}
+              onChangeText={setIdentifier}
+              keyboardType="email-address"
+              editable={!isLoading}
+              error={error || undefined}
+            />
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Mot de passe</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Entrez votre mot de passe"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                editable={!isLoading}
-                placeholderTextColor="#999"
-              />
-            </View>
+            <Input
+              label="Mot de passe"
+              placeholder="Entrez votre mot de passe"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!isLoading}
+            />
 
-            {error && (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            )}
-
-            <TouchableOpacity
-              style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+            <Button
+              title={isLoading ? "Connexion..." : "Se connecter"}
               onPress={handleLogin}
               disabled={isLoading}
-              activeOpacity={0.8}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <Text style={styles.loginButtonText}>Se connecter</Text>
-              )}
-            </TouchableOpacity>
+              variant="primary"
+              size="large"
+              style={styles.loginButton}
+            />
           </View>
 
           <View style={styles.footer}>
-            <TouchableOpacity 
-              style={styles.forgotPasswordLink}
+            <Button
+              title="Mot de passe oublié ?"
               onPress={() => router.push('/forgot-password' as any)}
               disabled={isLoading}
-            >
-              <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
-            </TouchableOpacity>
+              variant="secondary"
+              size="small"
+              style={styles.forgotPasswordButton}
+            />
             
-            <Text style={styles.footerText}>
-              Pas encore de compte ?{' '}
-              <TouchableOpacity onPress={() => router.push('/register' as any)}>
-                <Text style={styles.linkText}>Créer un compte</Text>
-              </TouchableOpacity>
-            </Text>
+            <View style={styles.footerTextContainer}>
+              <Text style={styles.footerText}>
+                Pas encore de compte ?
+              </Text>
+              <Button
+                title="Créer un compte"
+                onPress={() => router.push('/register' as any)}
+                variant="secondary"
+                size="small"
+                style={styles.linkButton}
+              />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -209,57 +195,26 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   loginButton: {
-    backgroundColor: '#3498db',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-    boxShadow: '0 4px 8px rgba(52,152,219,0.3)',
-    elevation: 8,
-  },
-  loginButtonDisabled: {
-    backgroundColor: '#bdc3c7',
-    elevation: 0,
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  resetButton: {
-    backgroundColor: '#27ae60',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 16,
-    boxShadow: '0 4px 8px rgba(39,174,96,0.3)',
-    elevation: 8,
-  },
-  resetButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: 20,
   },
   footer: {
     alignItems: 'center',
+    marginTop: 20,
+  },
+  footerTextContainer: {
+    alignItems: 'center',
+    marginTop: 10,
   },
   footerText: {
     fontSize: 14,
     color: '#7f8c8d',
+    textAlign: 'center',
+    marginBottom: 8,
   },
-  linkText: {
-    color: '#3498db',
-    fontWeight: '600',
+  forgotPasswordButton: {
+    marginBottom: 10,
   },
-  forgotPasswordLink: {
-    alignItems: 'center',
-    marginBottom: 20,
-    padding: 10,
-  },
-  forgotPasswordText: {
-    color: '#3498db',
-    fontSize: 16,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
+  linkButton: {
+    marginTop: 8,
   },
 });
