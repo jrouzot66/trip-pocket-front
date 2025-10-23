@@ -148,13 +148,23 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.logoutButtonText}>Se déconnecter</Text>
-        </TouchableOpacity>
+        <View style={styles.actionsSection}>
+          <TouchableOpacity
+            style={styles.chatButton}
+            onPress={() => router.push('/chat-list' as any)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.chatButtonText}>💬 Messages</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.logoutButtonText}>Se déconnecter</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -257,6 +267,28 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  actionsSection: {
+    gap: 16,
+  },
+  chatButton: {
+    backgroundColor: '#3498db',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#3498db',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+  chatButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   logoutButton: {
     backgroundColor: '#e74c3c',
