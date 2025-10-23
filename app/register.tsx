@@ -107,6 +107,51 @@ export default function RegisterScreen() {
     });
   };
 
+  // Fonction pour générer des données aléatoires (mode dev uniquement)
+  const fillWithRandomData = () => {
+    const firstNames = ['Jean', 'Marie', 'Pierre', 'Sophie', 'Antoine', 'Camille', 'Lucas', 'Emma', 'Thomas', 'Léa'];
+    const lastNames = ['Martin', 'Bernard', 'Thomas', 'Petit', 'Robert', 'Richard', 'Durand', 'Dubois', 'Moreau', 'Laurent'];
+    const cities = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'];
+    const genders = ['MAN', 'WOMAN', 'OTHER'];
+    
+    const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const randomCity = cities[Math.floor(Math.random() * cities.length)];
+    const randomGender = genders[Math.floor(Math.random() * genders.length)];
+    
+    // Générer une date de naissance aléatoire (entre 18 et 65 ans)
+    const currentYear = new Date().getFullYear();
+    const birthYear = currentYear - 18 - Math.floor(Math.random() * 47);
+    const birthMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+    const birthDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+    
+    // Générer un numéro de téléphone aléatoire
+    const phoneNumber = '0' + Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + 
+                       Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + 
+                       Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + 
+                       Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + '0';
+    
+    // Générer un mot de passe sécurisé
+    const securePassword = 'Test123!@#';
+    
+    setFormData({
+      username: `${randomFirstName.toLowerCase()}${randomLastName.toLowerCase()}${Math.floor(Math.random() * 100)}`,
+      email: `${randomFirstName.toLowerCase()}.${randomLastName.toLowerCase()}@example.com`,
+      password: securePassword,
+      phone: phoneNumber,
+      firstname: randomFirstName,
+      lastname: randomLastName,
+      birthday: `${birthYear}-${birthMonth}-${birthDay}`,
+      countryCode: 'FR',
+      language: 'fr',
+      genderCode: randomGender,
+      city: randomCity,
+      thumbnail: '',
+      rgpd: true,
+      visibility: 'PUBLIC'
+    });
+  };
+
 
   return (
     <KeyboardAvoidingView 
@@ -122,6 +167,15 @@ export default function RegisterScreen() {
           <View style={styles.header}>
             <Text style={styles.title}>Créer un compte</Text>
             <Text style={styles.subtitle}>Rejoignez Trip Pocket</Text>
+            
+            {/* Bouton de développement - visible uniquement en mode dev */}
+            <TouchableOpacity
+              style={styles.devButton}
+              onPress={fillWithRandomData}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.devButtonText}>🔧 Remplir avec des données aléatoires</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.form}>
@@ -490,5 +544,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#7f8c8d',
     lineHeight: 16,
+  },
+  devButton: {
+    backgroundColor: '#f39c12',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 16,
+    borderWidth: 2,
+    borderColor: '#e67e22',
+  },
+  devButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
