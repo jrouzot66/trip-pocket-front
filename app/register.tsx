@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -12,28 +12,14 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useFormFiller } from '../src/lib/useFormFiller';
 import { useRegister } from '../src/lib/useRegister';
 import { useAuthStore } from '../src/store/authStore';
 import alert from '../src/utils/alert';
 import { getPasswordRequirements, validatePassword } from '../src/utils/passwordValidation';
 
 export default function RegisterScreen() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    phone: '',
-    firstname: '',
-    lastname: '',
-    birthday: '',
-    countryCode: 'FR',
-    language: 'fr',
-    genderCode: 'MAN',
-    city: '',
-    thumbnail: '',
-    rgpd: false,
-    visibility: 'PUBLIC'
-  });
+  const { formData, setFormData, fillWithRandomData, resetForm, updateFormData } = useFormFiller();
 
   const { register, isLoading, error, reset } = useRegister();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -48,9 +34,6 @@ export default function RegisterScreen() {
     }
   }, [isAuthenticated, storeIsLoading]);
 
-  const updateFormData = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
 
   const validateForm = (): boolean => {
     const requiredFields = ['username', 'email', 'password', 'phone', 'firstname', 'lastname', 'birthday', 'city'];
@@ -89,67 +72,7 @@ export default function RegisterScreen() {
 
   const handleReset = () => {
     reset();
-    setFormData({
-      username: '',
-      email: '',
-      password: '',
-      phone: '',
-      firstname: '',
-      lastname: '',
-      birthday: '',
-      countryCode: 'FR',
-      language: 'fr',
-      genderCode: 'MAN',
-      city: '',
-      thumbnail: '',
-      rgpd: false,
-      visibility: 'PUBLIC'
-    });
-  };
-
-  // Fonction pour générer des données aléatoires (mode dev uniquement)
-  const fillWithRandomData = () => {
-    const firstNames = ['Jean', 'Marie', 'Pierre', 'Sophie', 'Antoine', 'Camille', 'Lucas', 'Emma', 'Thomas', 'Léa'];
-    const lastNames = ['Martin', 'Bernard', 'Thomas', 'Petit', 'Robert', 'Richard', 'Durand', 'Dubois', 'Moreau', 'Laurent'];
-    const cities = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'];
-    const genders = ['MAN', 'WOMAN', 'OTHER'];
-    
-    const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const randomCity = cities[Math.floor(Math.random() * cities.length)];
-    const randomGender = genders[Math.floor(Math.random() * genders.length)];
-    
-    // Générer une date de naissance aléatoire (entre 18 et 65 ans)
-    const currentYear = new Date().getFullYear();
-    const birthYear = currentYear - 18 - Math.floor(Math.random() * 47);
-    const birthMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
-    const birthDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
-    
-    // Générer un numéro de téléphone aléatoire
-    const phoneNumber = '0' + Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + 
-                       Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + 
-                       Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + 
-                       Math.floor(Math.random() * 9) + Math.floor(Math.random() * 9) + '0';
-    
-    // Générer un mot de passe sécurisé
-    const securePassword = 'Test123!@#';
-    
-    setFormData({
-      username: `${randomFirstName.toLowerCase()}${randomLastName.toLowerCase()}${Math.floor(Math.random() * 100)}`,
-      email: `${randomFirstName.toLowerCase()}.${randomLastName.toLowerCase()}@example.com`,
-      password: securePassword,
-      phone: phoneNumber,
-      firstname: randomFirstName,
-      lastname: randomLastName,
-      birthday: `${birthYear}-${birthMonth}-${birthDay}`,
-      countryCode: 'FR',
-      language: 'fr',
-      genderCode: randomGender,
-      city: randomCity,
-      thumbnail: '',
-      rgpd: true,
-      visibility: 'PUBLIC'
-    });
+    resetForm();
   };
 
 
@@ -169,13 +92,15 @@ export default function RegisterScreen() {
             <Text style={styles.subtitle}>Rejoignez Trip Pocket</Text>
             
             {/* Bouton de développement - visible uniquement en mode dev */}
-            <TouchableOpacity
-              style={styles.devButton}
-              onPress={fillWithRandomData}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.devButtonText}>🔧 Remplir avec des données aléatoires</Text>
-            </TouchableOpacity>
+            {process.env.NODE_ENV === 'development' && (
+              <TouchableOpacity
+                style={styles.devButton}
+                onPress={fillWithRandomData}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.devButtonText}>🔧 Remplir avec des données aléatoires</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.form}>
