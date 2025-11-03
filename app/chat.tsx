@@ -11,18 +11,29 @@ import {
   View
 } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
-import { useChatStore, User } from '../src/store/chatStore';
+import { useChatStore, User, Message } from '../src/store/chatStore';
+import { useChatWebSocketStore } from '../src/store/chatWebSocketStore';
 
 export default function ChatScreen() {
   const { chatId } = useLocalSearchParams<{ chatId: string }>();
   const { 
     getChatById, 
     getMessagesByChatId, 
-    sendMessage, 
+    sendMessage,
+    addMessage,
     markAsRead, 
     setCurrentChat 
   } = useChatStore();
   const currentUser = useAuthStore((state) => state.user);
+  const { 
+    socket,
+    isConnected, 
+    connect, 
+    disconnect, 
+    joinConversation, 
+    leaveConversation, 
+    sendMessage: sendWebSocketMessage 
+  } = useChatWebSocketStore();
   
   const [messageText, setMessageText] = useState('');
   const [otherUser, setOtherUser] = useState<User | null>(null);
@@ -30,6 +41,65 @@ export default function ChatScreen() {
 
   const chat = chatId ? getChatById(chatId) : null;
   const messages = chatId ? getMessagesByChatId(chatId) : [];
+
+  // Connexion WebSocket
+  useEffect(() => {
+    connect();
+    return () => {
+      disconnect();
+    };
+  }, [connect, disconnect]);
+
+  // Rejoindre/quitter la conversation
+  useEffect(() => {
+    if (chatId && isConnected) {
+      joinConversation(chatId);
+    }
+    
+    return () => {
+      if (chatId) {
+        leaveConversation(chatId);
+      }
+    };
+  }, [chatId, isConnected, joinConversation, leaveConversation]);
+
+  // Écouter les nouveaux messages
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (message: any) => {
+      if (__DEV__) {
+        console.log('📨 Nouveau message reçu:', message);
+      }
+
+      // Convertir le message du format WebSocket au format du store
+      const chatMessage: Message = {
+        id: message.id,
+        chatId: chatId || undefined,
+        senderId: message.senderId,
+        senderUsername: message.senderUsername,
+        content: message.content,
+        timestamp: typeof message.createdAt === 'string' 
+          ? new Date(message.createdAt).getTime() 
+          : new Date(message.createdAt).getTime(),
+        isRead: message.isRead || false,
+        conversationToken: message.conversationToken,
+      };
+
+      addMessage(chatId || '', chatMessage);
+      
+      // Scroll vers le bas
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    };
+
+    socket.on('new_message', handleNewMessage);
+
+    return () => {
+      socket.off('new_message', handleNewMessage);
+    };
+  }, [socket, chatId, addMessage]);
 
   useEffect(() => {
     if (chatId) {
@@ -40,7 +110,7 @@ export default function ChatScreen() {
     return () => {
       setCurrentChat(null);
     };
-  }, [chatId]);
+  }, [chatId, setCurrentChat, markAsRead]);
 
   useEffect(() => {
     if (chat && currentUser) {
@@ -57,14 +127,20 @@ export default function ChatScreen() {
   const handleSendMessage = useCallback(() => {
     if (!messageText.trim() || !chatId || !currentUser) return;
 
-    sendMessage(chatId, messageText.trim(), currentUser._id?.toString() || '');
+    // Envoyer via WebSocket si connecté, sinon via le store local
+    if (isConnected) {
+      sendWebSocketMessage(chatId, messageText.trim());
+    } else {
+      sendMessage(chatId, messageText.trim(), currentUser._id?.toString() || '');
+    }
+    
     setMessageText('');
     
     // Scroll vers le bas après l'envoi
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
-  }, [messageText, chatId, currentUser, sendMessage]);
+  }, [messageText, chatId, currentUser, sendMessage, sendWebSocketMessage, isConnected]);
 
   const formatTime = useCallback((timestamp: number) => {
     const date = new Date(timestamp);
@@ -140,7 +216,7 @@ export default function ChatScreen() {
               {chat?.isGroup ? (chat.groupName || 'Groupe') : (otherUser?.username || 'Utilisateur')}
             </Text>
             <Text style={styles.userStatus}>
-              {chat?.isGroup ? `${chat.participants.length} membre(s)` : 'En ligne'}
+              {chat?.isGroup ? `${chat.participants.length} membre(s)` : (isConnected ? 'En ligne' : 'Hors ligne')}
             </Text>
           </View>
         </View>

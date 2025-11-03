@@ -91,6 +91,15 @@ export default function LoginScreen() {
               secureTextEntry
               editable={!isLoading}
             />
+            {process.env.NODE_ENV === 'development' && (
+              <Button
+                title="Préremplir mot de passe"
+                onPress={() => setPassword('Test123!@#')}
+                variant="secondary"
+                size="small"
+                style={{ marginBottom: 12 }}
+              />
+            )}
 
             <Button
               title={isLoading ? "Connexion..." : "Se connecter"}

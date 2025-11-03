@@ -1,41 +1,46 @@
 import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  ActivityIndicator
 } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
-import { getDemoUsers, useChatStore, User } from '../src/store/chatStore';
+import { useChatStore } from '../src/store/chatStore';
+import { useFriendsStore } from '../src/store/friendsStore';
 
 export default function ChatListScreen() {
-  const { chats, createChat, createGroupChat, getUnreadCount } = useChatStore();
+  const { chats, getUnreadCount, loadConversations, isLoading, openChatWithFriend } = useChatStore();
+  const { friends, loadFriends, isLoading: isLoadingFriends } = useFriendsStore();
   const currentUser = useAuthStore((state) => state.user);
-  const [demoUsers] = useState<User[]>(getDemoUsers());
 
-  const handleStartChat = useCallback((user: User) => {
-    if (!currentUser) return;
-    
-    // Créer un utilisateur compatible avec le store de chat
-    const currentUserForChat: User = {
-      id: currentUser._id || 'current',
-      username: currentUser._username || 'Utilisateur',
-      email: currentUser._email || '',
-      avatar: '👤'
-    };
-    
-    // Créer un chat avec l'utilisateur sélectionné
-    const chatId = createChat([currentUserForChat, user]);
-    
-    // Naviguer vers le chat
-    router.push({
-      pathname: '/chat',
-      params: { chatId }
-    });
-  }, [currentUser, createChat]);
+  useEffect(() => {
+    // Charger les conversations et les amis depuis l'API au montage du composant
+    loadConversations();
+    loadFriends();
+  }, [loadConversations, loadFriends]);
 
+  const handleStartChatWithFriend = useCallback(async (friendId: string) => {
+    // Ouvrir la conversation avec l'ami (cherche dans les conversations existantes)
+    const chat = await openChatWithFriend(friendId);
+    
+    if (chat) {
+      // Naviguer vers le chat
+      router.push({
+        pathname: '/chat',
+        params: { chatId: chat.id }
+      });
+    } else {
+      // Si la conversation n'existe pas, afficher un message d'erreur
+      if (__DEV__) {
+        console.error('❌ Conversation non trouvée avec cet ami');
+      }
+    }
+  }, [openChatWithFriend]);
+  
   const handleOpenChat = useCallback((chatId: string) => {
     router.push({
       pathname: '/chat',
@@ -70,9 +75,20 @@ export default function ChatListScreen() {
       displayName = item.groupName || 'Groupe';
       displayAvatar = item.groupAvatar || '👥';
     } else {
-      const otherUser = item.participants.find((p: User) => p.id !== currentUser?._id?.toString());
+      const otherUser = item.participants?.find((p: any) => 
+        p.id !== currentUser?._id?.toString() && 
+        p.id !== currentUser?._id
+      );
       displayName = otherUser?.username || 'Utilisateur';
-      displayAvatar = otherUser?.avatar || '👤';
+      
+      // Gérer avatar qui peut être un string ou un objet { uri: string }
+      if (typeof otherUser?.avatar === 'string') {
+        displayAvatar = otherUser.avatar || '👤';
+      } else if (otherUser?.avatar?.uri) {
+        displayAvatar = '👤'; // Pour l'instant, on utilise l'emoji par défaut
+      } else {
+        displayAvatar = '👤';
+      }
     }
     
     return (
@@ -115,35 +131,59 @@ export default function ChatListScreen() {
     );
   }, [currentUser, handleOpenChat, formatTime]);
 
-  const renderUserItem = useCallback(({ item }: { item: User }) => (
-    <TouchableOpacity
-      style={styles.userItem}
-      onPress={() => handleStartChat(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.avatarContainer}>
-        <Text style={styles.avatar}>{item.avatar}</Text>
-      </View>
-      <Text style={styles.username}>{item.username}</Text>
-    </TouchableOpacity>
-  ), [handleStartChat]);
+  const renderFriendItem = useCallback(({ item }: { item: any }) => {
+    // Gérer avatar qui peut être un string ou un objet { uri: string }
+    let avatarDisplay = '👤';
+    if (typeof item.avatar === 'string') {
+      avatarDisplay = item.avatar;
+    } else if (item.avatar?.uri) {
+      avatarDisplay = '👤'; // Pour l'instant, on utilise l'emoji par défaut
+    }
+    
+    return (
+      <TouchableOpacity
+        style={styles.userItem}
+        onPress={() => handleStartChatWithFriend(item.id)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.avatarContainer}>
+          <Text style={styles.avatar}>{avatarDisplay}</Text>
+        </View>
+        <Text style={styles.username}>{item.username}</Text>
+      </TouchableOpacity>
+    );
+  }, [handleStartChatWithFriend]);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Messages</Text>
-        <Text style={styles.subtitle}>
-          {getUnreadCount() > 0 && `${getUnreadCount()} message(s) non lu(s)`}
-        </Text>
+        <View style={styles.headerRight}>
+          {getUnreadCount() > 0 && (
+            <Text style={styles.subtitle}>
+              {getUnreadCount()} message(s) non lu(s)
+            </Text>
+          )}
+          <TouchableOpacity onPress={() => router.push('/friends')}>
+            <Text style={styles.friendsLink}>Amis</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {chats.length > 0 ? (
+      {isLoading ? (
+        <View style={styles.loadingState}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text style={styles.loadingText}>Chargement des conversations...</Text>
+        </View>
+      ) : chats.length > 0 ? (
         <FlatList
           data={chats}
           keyExtractor={(item) => item.id}
           renderItem={renderChatItem}
           style={styles.chatList}
           showsVerticalScrollIndicator={false}
+          refreshing={isLoading}
+          onRefresh={loadConversations}
         />
       ) : (
         <View style={styles.emptyState}>
@@ -154,25 +194,42 @@ export default function ChatListScreen() {
         </View>
       )}
 
-      <View style={styles.newChatSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Nouvelle conversation</Text>
-          <TouchableOpacity
-            style={styles.createGroupButton}
-            onPress={() => router.push('/create-group' as any)}
-          >
-            <Text style={styles.createGroupButtonText}>👥 Groupe</Text>
-          </TouchableOpacity>
+      {friends.length > 0 && (
+        <View style={styles.newChatSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Mes amis</Text>
+          </View>
+          {isLoadingFriends ? (
+            <ActivityIndicator size="small" color="#3498db" style={{ paddingVertical: 10 }} />
+          ) : (
+            <FlatList
+              data={friends}
+              keyExtractor={(item) => item.id}
+              renderItem={renderFriendItem}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.userList}
+            />
+          )}
         </View>
-        <FlatList
-          data={demoUsers}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderUserItem}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.userList}
-        />
-      </View>
+      )}
+      
+      {friends.length === 0 && !isLoadingFriends && (
+        <View style={styles.newChatSection}>
+          <View style={styles.emptyFriendsContainer}>
+            <Text style={styles.emptyFriendsText}>Aucun ami</Text>
+            <Text style={styles.emptyFriendsSubtext}>
+              Vous devez ajouter des amis pour démarrer une conversation
+            </Text>
+            <TouchableOpacity
+              style={styles.addFriendsButton}
+              onPress={() => router.push('/friends')}
+            >
+              <Text style={styles.addFriendsButtonText}>+ Ajouter des amis</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -189,6 +246,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e1e8ed',
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -198,6 +260,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#7f8c8d',
+  },
+  friendsLink: {
+    fontSize: 16,
+    color: '#3498db',
+    fontWeight: '600',
   },
   chatList: {
     flex: 1,
@@ -264,6 +331,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  loadingState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginTop: 16,
+  },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
@@ -321,5 +399,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
     minWidth: 80,
+  },
+  emptyFriendsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  emptyFriendsText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  emptyFriendsSubtext: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  addFriendsButton: {
+    backgroundColor: '#3498db',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  addFriendsButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -8,12 +8,15 @@ export interface User {
 }
 
 export interface Message {
-  id: string;
-  chatId: string;
-  senderId: string;
+  id: string | number;
+  chatId?: string;
+  senderId: string | number;
+  senderUsername?: string;
   content: string;
-  timestamp: number;
+  timestamp?: number;
+  createdAt?: string | Date;
   isRead: boolean;
+  conversationToken?: string;
 }
 
 export interface Chat {
@@ -33,11 +36,16 @@ interface ChatState {
   chats: Chat[];
   messages: { [chatId: string]: Message[] };
   currentChatId: string | null;
+  isLoading: boolean;
   
   // Actions
   createChat: (participants: User[]) => string;
   createGroupChat: (participants: User[], groupName: string, adminId: string | number) => string;
+  loadConversations: () => Promise<void>;
+  openChatWithFriend: (friendId: string) => Promise<Chat | null>;
+  setConversations: (conversations: Chat[]) => void;
   sendMessage: (chatId: string, content: string, senderId: string) => void;
+  addMessage: (chatId: string, message: Message) => void;
   markAsRead: (chatId: string) => void;
   setCurrentChat: (chatId: string | null) => void;
   getChatById: (chatId: string) => Chat | undefined;
@@ -80,6 +88,87 @@ export const useChatStore = create<ChatState>((set, get) => ({
   chats: [],
   messages: {},
   currentChatId: null,
+  isLoading: false,
+
+  loadConversations: async () => {
+    try {
+      set({ isLoading: true });
+      
+      // Import dynamique pour éviter les problèmes de circular dependency
+      const apiClient = (await import('../../app/config/apiClient')).default;
+      const response = await apiClient.get('/api/v1/conversations');
+      
+      const conversations: Chat[] = response.data.datas.map((conv: any) => ({
+        id: conv.id || conv.token,
+        participants: conv.participants || [],
+        unreadCount: 0,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        isGroup: conv.isGroup || false,
+        groupName: conv.groupName,
+        groupAvatar: '👥',
+      }));
+      
+      set({ chats: conversations, isLoading: false });
+      
+      if (__DEV__) {
+        console.log('✅ Conversations chargées:', conversations.length);
+      }
+    } catch (error) {
+      if (__DEV__) {
+        console.error('❌ Erreur lors du chargement des conversations:', error);
+      }
+      set({ isLoading: false });
+    }
+  },
+
+  setConversations: (conversations: Chat[]) => {
+    set({ chats: conversations });
+  },
+
+  openChatWithFriend: async (friendId: string): Promise<Chat | null> => {
+    try {
+      // Chercher si la conversation existe déjà dans la liste chargée
+      const existingChat = get().chats.find(chat => {
+        // Vérifier si le chat a cet ami comme participant et n'est pas un groupe
+        return !chat.isGroup && 
+               chat.participants.some(p => 
+                 p.id?.toString() === friendId.toString() || 
+                 p.id === friendId
+               );
+      });
+      
+      if (existingChat) {
+        if (__DEV__) {
+          console.log('✅ Conversation trouvée dans la liste:', existingChat.id);
+        }
+        return existingChat;
+      }
+      
+      if (__DEV__) {
+        console.warn('⚠️ Conversation non trouvée. Recharger la liste des conversations.');
+      }
+      
+      // Si pas trouvée, recharger les conversations
+      await get().loadConversations();
+      
+      // Chercher à nouveau
+      const chat = get().chats.find(chat => {
+        return !chat.isGroup && 
+               chat.participants.some(p => 
+                 p.id?.toString() === friendId.toString() || 
+                 p.id === friendId
+               );
+      });
+      
+      return chat || null;
+    } catch (error: any) {
+      if (__DEV__) {
+        console.error('❌ Erreur lors de l\'ouverture de la conversation avec ami:', error);
+      }
+      return null;
+    }
+  },
 
   createChat: (participants: User[]) => {
     const chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -148,6 +237,39 @@ export const useChatStore = create<ChatState>((set, get) => ({
             lastMessage: message, 
             updatedAt: Date.now(),
             unreadCount: isOtherParticipant ? chat.unreadCount + 1 : chat.unreadCount
+          };
+        }
+        return chat;
+      });
+
+      return {
+        chats: updatedChats,
+        messages: newMessages
+      };
+    });
+  },
+
+  addMessage: (chatId: string, message: Message) => {
+    set(state => {
+      const currentMessages = state.messages[chatId] || [];
+      const messageExists = currentMessages.some(msg => msg.id === message.id);
+      
+      if (messageExists) {
+        return state; // Éviter les doublons
+      }
+
+      const newMessages = {
+        ...state.messages,
+        [chatId]: [...currentMessages, message]
+      };
+
+      // Mettre à jour le chat avec le dernier message
+      const updatedChats = state.chats.map(chat => {
+        if (chat.id === chatId) {
+          return { 
+            ...chat, 
+            lastMessage: message, 
+            updatedAt: Date.now()
           };
         }
         return chat;
